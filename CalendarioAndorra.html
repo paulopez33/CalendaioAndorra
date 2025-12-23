@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestras Navidades ❤️</title>
+    <style>
+        :root { --color-andorra: #3498db; --color-ripollet: #e67e22; --color-love: #ff4757; }
+        body { font-family: 'Segoe UI', sans-serif; background: #fdf0f1; margin: 0; padding: 20px; text-align: center; }
+        #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); display: flex; justify-content: center; align-items: center; z-index: 2000; transition: 0.5s; }
+        .lock-box { background: white; padding: 40px 20px; border-radius: 30px; width: 85%; max-width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 500px; margin: 20px auto; }
+        .day-card { background: white; height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 15px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 2px solid #eee; transition: 0.3s; }
+        .day-card.unlocked { border-color: var(--color-love); background: #fff5f5; transform: scale(1.05); }
+        .day-number { font-size: 24px; font-weight: bold; }
+        .month { font-size: 11px; text-transform: uppercase; color: #888; }
+        .destiny-info { margin-top: 8px; font-size: 10px; font-weight: bold; padding: 4px 8px; border-radius: 10px; color: white; }
+        .bg-andorra { background-color: var(--color-andorra); }
+        .bg-ripollet { background-color: var(--color-ripollet); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px 20px; border-radius: 25px; width: 90%; max-width: 350px; }
+        input { width: 90%; padding: 12px; margin: 15px 0; border-radius: 25px; border: 2px solid #ddd; text-align: center; font-size: 16px; outline: none; }
+        button { background: var(--color-love); color: white; border: none; padding: 12px 25px; border-radius: 25px; width: 100%; font-weight: bold; cursor: pointer; }
+        
+        #final-msg { display: none; background: white; padding: 35px 25px; border-radius: 30px; margin: 40px auto; max-width: 500px; border: 4px dashed var(--color-love); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
+        #final-msg h2 { color: var(--color-love); margin-top: 0; }
+        #final-image { max-width: 100%; border-radius: 20px; margin-top: 25px; }
+    </style>
+</head>
+<body>
+
+    <div id="lock-screen">
+        <div class="lock-box">
+            <h2 style="color:var(--color-love)">🔒 Acceso Restringido</h2>
+            <p>Shhh... Solo tu novio sabe qué poner aquí. <br><b>Pídele la clave si quieres entrar.</b></p>
+            <input type="text" id="pass-input" placeholder="Escribe la clave secreta...">
+            <button onclick="checkPassword()">Desbloquear Calendario</button>
+            <p id="pass-error" style="color:red; display:none; margin-top:10px; font-size:14px;">¡Esa no es! Tu novio te está tomando el pelo... 😜</p>
+        </div>
+    </div>
+
+    <h1>🎄 Nuestras Navidades ❤️</h1>
+    <div class="grid" id="calendar-grid"></div>
+
+    <div id="final-msg">
+        <h2>¡Misión Cumplida, mi amor! ❤️</h2>
+        <p>Has desvelado cada secreto de este calendario. Ya tienes las fechas, los lugares y todos los "sí" que necesitaba escuchar.</p>
+        <p>Pero recuerda: da igual si estamos bajo la nieve de <span style="color:var(--color-andorra); font-weight:bold;">Andorra</span> o en la tranquilidad de <span style="color:var(--color-ripollet); font-weight:bold;">Ripollet</span>; el mejor destino de estas Navidades (y de mi vida) siempre será donde estés tú.</p>
+        <p>Prepárate para el frío, para los mimos y para crear recuerdos que no quepan en ninguna foto. <br> <strong>¡TE AMO INFINITO!</strong></p>
+        <img id="final-image" src="https://images.unsplash.com/photo-1547764956-6a56e2d93e2d?auto=format&fit=crop&w=800&q=80">
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h3 id="modal-day" style="color:var(--color-love)"></h3>
+            <p id="question-text"></p>
+            <input type="text" id="answer-input" placeholder="Tu respuesta...">
+            <button onclick="verifyAnswer()">Comprobar</button>
+            <p id="hint-msg" style="display:none; color:#555; font-size:13px; margin-top:15px; font-style:italic; background:#fff0f1; padding:10px; border-radius:10px;"></p>
+        </div>
+    </div>
+
+    <script>
+        // Camuflaje de contraseña @teamomucho
+        const _vK = [64, 116, 101, 97, 109, 111, 109, 117, 99, 104, 111];
+        const _gS = () => String.fromCharCode(..._vK);
+
+        function checkPassword() {
+            const input = document.getElementById('pass-input').value.toLowerCase().trim();
+            if(input === _gS()) {
+                document.getElementById('lock-screen').style.opacity = "0";
+                setTimeout(() => document.getElementById('lock-screen').style.display = "none", 500);
+            } else {
+                document.getElementById('pass-error').style.display = "block";
+            }
+        }
+
+        const data = [
+            { dia: 26, mes: 'Dic', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "¿Dónde fue el primer beso?", a: "villa nicole" },
+            { dia: 27, mes: 'Dic', lugar: 'Andorra 🏔️', tipo: 'andorra', q: "¿Color de camiseta para arbitrar?", a: "amarillo" },
+            { dia: 28, mes: 'Dic', lugar: 'Andorra 🏔️', tipo: 'andorra', q: "¿Desayuno diario de tu novio?", a: "bocadillo de pavo" },
+            { dia: 29, mes: 'Dic', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "¿Artista favorito?", a: "bad bunny" },
+            { dia: 30, mes: 'Dic', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "¿Primer restaurante juntos?", a: "mcdonald's" },
+            { dia: 31, mes: 'Dic', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "¿Quién dijo te quiero primero?", a: "nicole" },
+            { dia: 1, mes: 'Ene', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "¿Canción que nos representa?", a: "casualidad" },
+            { dia: 2, mes: 'Ene', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "¿Partido del primer beso?", a: "argentina-holanda" },
+            { dia: 3, mes: 'Ene', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "¿Cuánto te quiero?", a: "infinito" },
+            { dia: 4, mes: 'Ene', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "Tubérculo favorito", a: "boniato" },
+            { dia: 5, mes: 'Ene', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "Regalo: ¿Entradas para...?", a: "bad bunny" },
+            { dia: 6, mes: 'Ene', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "Canción primer beso: Danza...", a: "kuduro" },
+            { dia: 7, mes: 'Ene', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "¿Qué móvil elegiría tu novio?", a: "iphone" },
+            { dia: 8, mes: 'Ene', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "Marca ropa de correr", a: "kiprun" },
+            { dia: 9, mes: 'Ene', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "¿Qué veíamos el día del primer beso?", a: "el mundial" },
+            { dia: 10, mes: 'Ene', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "¿Comida favorita de tu novio del Mercadona?", a: "delicias de pollo" },
+            { dia: 11, mes: 'Ene', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "¿A dónde vamos cada día a las siete de la tarde aprox?", a: "al gali" },
+            { dia: 12, mes: 'Ene', lugar: 'Ripollet 🏠', tipo: 'ripollet', q: "¿Quién es el chico más guapo, listo y que mejor sabe elegir regalos de todo Ripollet?", a: "pau" }
+        ];
+
+        let sI = null; let uC = 0;
+
+        function init() {
+            const g = document.getElementById('calendar-grid');
+            data.forEach((it, idx) => {
+                const c = document.createElement('div');
+                c.className = 'day-card';
+                c.id = `card-${idx}`;
+                c.onclick = () => openM(idx);
+                c.innerHTML = `<span class="month">${it.mes}</span><span class="day-number">${it.dia}</span><div id="dest-${idx}"></div>`;
+                g.appendChild(c);
+            });
+        }
+
+        function openM(idx) {
+            if(document.getElementById(`card-${idx}`).classList.contains('unlocked')) return;
+            sI = idx;
+            document.getElementById('modal-day').innerText = `${data[idx].dia} de ${data[idx].mes}`;
+            document.getElementById('question-text').innerText = data[idx].q;
+            document.getElementById('answer-input').value = "";
+            document.getElementById('hint-msg').style.display = "none";
+            document.getElementById('modal').style.display = "flex";
+        }
+
+        function verifyAnswer() {
+            const i = document.getElementById('answer-input').value.toLowerCase().trim();
+            const c = data[sI].a.toLowerCase();
+            if (i.includes(c) || (c.includes("mcdonald") && i.includes("mcdonald"))) {
+                uD();
+            } else {
+                const h = document.getElementById('hint-msg');
+                h.style.display = "block";
+                h.innerText = "❌ ¡Casi! Inténtalo de nuevo ❤️";
+            }
+        }
+
+        function uD() {
+            document.getElementById('modal').style.display = "none";
+            const c = document.getElementById(`card-${sI}`);
+            c.classList.add('unlocked');
+            const info = data[sI];
+            document.getElementById(`dest-${sI}`).innerHTML = `<div class="destiny-info ${info.tipo === 'andorra' ? 'bg-andorra' : 'bg-ripollet'}">${info.lugar}</div>`;
+            uC++;
+            if(uC === 18) {
+                setTimeout(() => { 
+                    document.getElementById('final-msg').style.display = "block"; 
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); 
+                }, 600);
+            }
+        }
+
+        document.addEventListener("keypress", (e) => { 
+            if (e.key === "Enter") { 
+                if(document.getElementById('lock-screen').style.display !== "none") checkPassword(); 
+                else if(document.getElementById('modal').style.display === "flex") verifyAnswer(); 
+            } 
+        });
+        init();
+    </script>
+</body>
+</html>
